@@ -11,10 +11,17 @@ const ELEVATION = (CAMERA.elevationDeg * Math.PI) / 180;
 const PAN_LIMIT = HALF_WORLD + CAMERA.panMargin;
 const ORIGIN = new Vector3(0, 0, 0);
 
-/** Zoom that fits the whole land on screen; phones get a smaller value than desktops. */
+/**
+ * Initial zoom frames the family's own elements (house, trees, garden span ~26 units),
+ * not the whole land: on a portrait phone the full land left them tiny. Zoom out to see the rest.
+ */
+const FOCUS_SPAN = 26 * Math.SQRT2;
 export function fitZoom(width: number, height: number) {
   const landDiagonal = HALF_WORLD * 2 * Math.SQRT2;
-  return Math.min(width / (landDiagonal * 1.05), height / (landDiagonal * 0.75));
+  const focus = Math.min(width / (FOCUS_SPAN * 1.05), height / (FOCUS_SPAN * 0.75));
+  const whole = Math.min(width / (landDiagonal * 1.05), height / (landDiagonal * 0.75));
+  // Never zoom in beyond the whole-land view by more than 1.8× (keeps desktop context).
+  return Math.min(focus, whole * 1.8);
 }
 
 /**
