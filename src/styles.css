@@ -1,0 +1,94 @@
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; height: 100%; overflow: hidden; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #a8d8ea;
+  color: #1b3a1b;
+  -webkit-tap-highlight-color: transparent;
+}
+.app { position: fixed; inset: 0; touch-action: none; }
+canvas { display: block; touch-action: none; }
+
+.hud-title {
+  position: absolute; top: max(12px, env(safe-area-inset-top)); left: 16px;
+  pointer-events: none;
+}
+.hud-title h1 { margin: 0; font-size: 20px; letter-spacing: 0.02em; color: #1b3a1b; }
+.hud-title p { margin: 2px 0 0; font-size: 12px; opacity: 0.75; }
+
+.hud-controls {
+  position: absolute; right: 16px; bottom: max(16px, env(safe-area-inset-bottom));
+  display: grid; grid-template-columns: repeat(2, 48px); gap: 8px;
+}
+.hud-controls button {
+  width: 48px; height: 48px; border: none; border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88); color: #2e4d2e;
+  font-size: 22px; line-height: 1; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.hud-controls button:active { transform: scale(0.94); }
+.hud-controls button[aria-pressed="true"] { background: #2e7d32; color: #fff; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+button { font: inherit; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.primary {
+  border: none; border-radius: 12px; padding: 0 18px; height: 44px;
+  background: #2e7d32; color: #fff; font-weight: 600; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.ghost-btn {
+  border: 1px dashed #8a8a8a; border-radius: 12px; padding: 0 12px; height: 40px;
+  background: transparent; color: #555; cursor: pointer; white-space: nowrap;
+}
+.icon-btn {
+  width: 44px; height: 44px; border: none; border-radius: 12px; cursor: pointer;
+  background: #eef3ea; color: #2e4d2e; font-size: 20px;
+}
+
+.inventory {
+  position: absolute; top: calc(max(12px, env(safe-area-inset-top)) + 52px); left: 16px;
+  display: flex; gap: 6px; flex-wrap: wrap; pointer-events: none;
+}
+.chip {
+  background: rgba(255, 255, 255, 0.9); border-radius: 999px; padding: 4px 10px;
+  font-size: 14px; font-weight: 600; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.build-btn { position: absolute; left: 16px; bottom: max(16px, env(safe-area-inset-bottom)); height: 52px; font-size: 16px; }
+
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.25); display: flex; align-items: flex-end; justify-content: center; }
+.sheet {
+  width: 100%; max-width: 520px; max-height: 75%; overflow-y: auto;
+  background: #fbfaf5; border-radius: 20px 20px 0 0; padding: 16px 16px max(16px, env(safe-area-inset-bottom));
+}
+.sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.sheet-head h2 { margin: 0; font-size: 18px; }
+.catalog { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.catalog li {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: #fff; border-radius: 14px; padding: 10px 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.catalog li.locked .catalog-info strong { color: #777; }
+.catalog-info { display: grid; gap: 2px; min-width: 0; }
+.catalog-info small { color: #555; }
+.cost { display: inline-flex; gap: 8px; }
+.cost .short { color: #c62828; font-weight: 600; }
+.hint { color: #8d6e63 !important; }
+
+.placement-bar {
+  position: absolute; left: 16px; right: 136px; bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.95); border-radius: 16px; padding: 10px 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18); max-width: 560px;
+}
+.placement-text { display: grid; min-width: 0; }
+.placement-text small { color: #2e7d32; }
+.placement-text small.warn { color: #c62828; }
+.placement-actions { display: flex; gap: 8px; }
+
+.toast {
+  position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+  background: #1b3a1b; color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
