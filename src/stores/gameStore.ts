@@ -9,15 +9,24 @@ export type PlaceResult =
   | { ok: true; object: PlacedObject }
   | { ok: false; reason: "locked" | "insufficient" | "out_of_bounds" | "overlap" };
 
+/** TDD §5 reward_claims: one row per achievement ever granted. */
+export type RewardClaim = {
+  achievementId: string;
+  claimedAt: string;
+  /** Quest whose approval earned it; absent for the starter reward and dev claims. */
+  questId?: string;
+  approvedBy?: string;
+};
+
 type GameState = {
   materials: Materials;
   unlockedBlueprints: BuildingId[];
-  /** Achievement ids whose reward was already granted — guards "reward belum pernah diberikan". */
-  claimedAchievements: string[];
+  /** Guards "reward belum pernah diberikan": an achievement appears here at most once. */
+  rewardClaims: RewardClaim[];
   objects: PlacedObject[];
 
   /** Grant an achievement's reward exactly once. Returns false if already claimed / unknown. */
-  grantAchievement: (id: string) => boolean;
+  grantAchievement: (id: string, source?: { questId: string; approvedBy: string }) => boolean;
   grantStarterRewards: () => void;
   placeBuilding: (type: BuildingId, gx: number, gz: number, rotation: Rotation) => PlaceResult;
 };
@@ -28,15 +37,15 @@ const newObjectId = () => `obj-${Date.now().toString(36)}-${(nextId++).toString(
 export const useGameStore = create<GameState>((set, get) => ({
   materials: { ...EMPTY_MATERIALS },
   unlockedBlueprints: [],
-  claimedAchievements: [],
+  rewardClaims: [],
   objects: [],
 
-  grantAchievement: (id) => {
+  grantAchievement: (id, source) => {
     const def = ACHIEVEMENTS.find((a) => a.id === id);
     const s = get();
-    if (!def || s.claimedAchievements.includes(id)) return false;
+    if (!def || s.rewardClaims.some((c) => c.achievementId === id)) return false;
     set({
-      claimedAchievements: [...s.claimedAchievements, id],
+      rewardClaims: [...s.rewardClaims, { achievementId: id, claimedAt: new Date().toISOString(), ...source }],
       materials: add(s.materials, def.reward.materials),
       unlockedBlueprints: [...new Set([...s.unlockedBlueprints, ...def.reward.blueprints])],
     });

@@ -23,6 +23,8 @@ export type Quest = {
   dueDate?: string;
   status: QuestStatus;
   createdBy: string;
+  /** Achievement granted when a parent approves this quest (optional). */
+  achievementId?: string;
 };
 
 /** TDD §5 quest_submissions. One row per submit; review fields fill in when a parent decides. */

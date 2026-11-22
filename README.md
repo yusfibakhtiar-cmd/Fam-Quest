@@ -49,3 +49,9 @@ npm test   # aturan grid, invariant ekonomi reward, dan transaksi bangun
 Alur: orang tua membuat quest → anggota yang ditugaskan mencatat progres → ajukan saat target tercapai → orang tua menyetujui atau mengembalikan dengan catatan.
 
 Belum: data hilang saat refresh (M5), quest belum membuka achievement (M4), pergantian anggota belum dilindungi login (M5).
+
+## Milestone 4 — Achievement Integration
+
+- Orang tua memilih achievement (opsional) saat membuat quest; disetujui → blueprint + material masuk otomatis
+- `src/features/achievements/availability.ts` — achievement mana yang boleh dipilih (belum diraih, tidak dipakai quest terbuka lain, bukan achievement awal)
+- Layar **Pencapaian**: diraih (dengan cerita: kapan, lewat quest apa, disetujui siapa), sedang diperjuangkan, atau tersedia

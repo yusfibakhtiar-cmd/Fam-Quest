@@ -15,7 +15,11 @@ Catatan keputusan yang menyimpang dari atau melengkapi TDD v0.1.
 | 2026-11-22 | Penolakan wajib disertai catatan; quest yang ditolak bisa dikerjakan lagi & diajukan ulang. | Penolakan tanpa alasan tidak membantu anak memperbaiki. |
 | 2026-11-22 | Status `completed` dihapus (`approved` = final); `locked` ditunda. | Menghilangkan dua status yang tumpang-tindih di TDD §4.1. |
 | 2026-11-22 | Pergantian anggota aktif di perangkat **belum** dilindungi. | Bukan keamanan — login per anggota datang dengan Supabase Auth (M5). Sampai itu, anak secara teknis bisa "menjadi" orang tua. |
+| 2026-11-22 | Quest → achievement: **orang tua memilih achievement saat membuat quest** (opsional). | Opsi (a); sederhana dan eksplisit. Syarat otomatis ditunda. |
+| 2026-11-22 | Satu achievement hanya boleh terhubung ke satu quest terbuka, dan tidak bisa dipilih setelah diraih. Achievement awal tidak bisa dipilih. Membatalkan quest melepas achievement-nya. | Tanpa ini, persetujuan kedua diam-diam tidak memberi apa-apa. `grantAchievement` tetap idempoten sebagai pengaman kedua. |
+| 2026-11-22 | `reward_claims` mencatat achievement, waktu, quest asal, dan orang tua yang menyetujui. | "Cerita pencapaian" (TDD §1.1) ditampilkan di layar Pencapaian. |
 
 ## Terbuka
+- **Hanya ada 4 achievement yang bisa diraih lewat quest.** Setelah semuanya diraih, quest tidak lagi menumbuhkan dunia. Perlu achievement bertingkat/berulang atau editor achievement (TDD §4.2 "dashboard admin").
 - Pindah/bongkar bangunan dengan refund — penting karena material langka.
 - Penyimpanan sementara (localStorage) sebelum Milestone 5.

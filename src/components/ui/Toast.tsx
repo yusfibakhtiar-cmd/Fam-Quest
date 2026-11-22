@@ -14,7 +14,7 @@ export function Toast() {
   const { message, token, clear } = useToastStore();
   useEffect(() => {
     if (!message) return;
-    const t = setTimeout(clear, 2200);
+    const t = setTimeout(clear, message.length > 40 ? 4000 : 2200); // reward messages need longer to read
     return () => clearTimeout(t);
   }, [message, token, clear]);
   return message ? <div className="toast" role="status">{message}</div> : null;

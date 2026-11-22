@@ -6,6 +6,7 @@ import { isParent } from "../../features/family/types";
 const TABS: Array<{ id: Screen; label: string; icon: string }> = [
   { id: "world", label: "Dunia", icon: "🏡" },
   { id: "quests", label: "Quest", icon: "📜" },
+  { id: "achievements", label: "Pencapaian", icon: "🏆" },
   { id: "family", label: "Keluarga", icon: "👨‍👩‍👧" },
 ];
 

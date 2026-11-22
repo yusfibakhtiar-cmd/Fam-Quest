@@ -22,7 +22,8 @@ export type QuestError =
   | "wrong_status"
   | "target_not_met"
   | "self_review"
-  | "note_required";
+  | "note_required"
+  | "achievement_unavailable";
 
 export const ERROR_LABEL: Record<QuestError, string> = {
   not_parent: "Hanya orang tua yang boleh melakukan ini.",
@@ -32,6 +33,7 @@ export const ERROR_LABEL: Record<QuestError, string> = {
   target_not_met: "Target belum tercapai.",
   self_review: "Pengajuanmu sendiri harus disetujui orang tua lain.",
   note_required: "Tuliskan alasan agar bisa diperbaiki.",
+  achievement_unavailable: "Achievement itu sudah diraih atau sudah dipakai quest lain.",
 };
 
 const fail = (reason: QuestError): Fail => ({ ok: false, reason });
@@ -47,13 +49,16 @@ export type NewQuestInput = {
   assignedTo: string[];
   targetValue?: number;
   dueDate?: string;
+  achievementId?: string;
 };
 
+/** `attachable` = achievement ids a new quest may link to (see achievements/availability.ts). */
 export function createQuest(
   actor: Member,
   input: NewQuestInput,
   members: Member[],
   ids: { id: string; now: string },
+  attachable: Set<string> = new Set(),
 ): Result<Quest> {
   if (!isParent(actor)) return fail("not_parent");
   const title = input.title.trim();
@@ -64,6 +69,7 @@ export function createQuest(
   if (!title || assigned.length === 0 || !assigned.every((id) => memberIds.has(id)) || !targetOk) {
     return fail("invalid_input");
   }
+  if (input.achievementId && !attachable.has(input.achievementId)) return fail("achievement_unavailable");
   return ok({
     id: ids.id,
     title,
@@ -77,6 +83,7 @@ export function createQuest(
     dueDate: input.dueDate || undefined,
     status: "available",
     createdBy: actor.id,
+    achievementId: input.achievementId || undefined,
   });
 }
 

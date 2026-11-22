@@ -104,7 +104,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .bottom-nav {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 10;
   height: calc(var(--nav-h) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: repeat(4, 1fr);
   background: rgba(251, 250, 245, 0.97); border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 .bottom-nav button {
@@ -188,3 +188,18 @@ legend { font-size: 13px; font-weight: 600; color: #3b4a3b; margin-bottom: 4px; 
 .danger { border: none; border-radius: 12px; padding: 0 18px; height: 44px; background: #c62828; color: #fff; font-weight: 600; cursor: pointer; }
 .link-btn { border: none; background: none; color: #8a8a8a; font-size: 13px; cursor: pointer; text-decoration: underline; margin-right: auto; }
 .toast { z-index: 40; }
+
+/* ---------- Milestone 4: achievements ---------- */
+.muted { color: #8a8a8a; font-weight: 400; }
+.achievement-chip { margin: 0; font-size: 13px; background: #fff8e1; border-radius: 10px; padding: 8px 10px; color: #6d4c00; }
+.achievement-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.achievement-list li { display: flex; gap: 12px; background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+.achievement-list li:not(.claimed) { opacity: 0.8; }
+.achievement-list li.claimed { outline: 2px solid #ffca28; }
+.trophy { font-size: 28px; line-height: 1; }
+.achievement-info { display: grid; gap: 3px; min-width: 0; }
+.achievement-info small { color: #5b6b5b; }
+.achievement-info .reward { color: #6d4c00; }
+.achievement-info .story { color: #2e7d32; font-weight: 600; }
+.link-inline { justify-self: start; border: none; background: none; padding: 0; color: #1565c0; font-size: 13px; cursor: pointer; text-align: left; text-decoration: underline; }
+.toast { max-width: calc(100% - 32px); text-align: center; }

@@ -2,6 +2,10 @@ import { useState } from "react";
 import { useFamilyStore } from "../../stores/familyStore";
 import { useQuestStore } from "../../stores/questStore";
 import { useToastStore } from "../../components/ui/Toast";
+import { useGameStore } from "../../stores/gameStore";
+import { ACHIEVEMENTS } from "../achievements/definitions";
+import { attachableAchievementIds } from "../achievements/availability";
+import { rewardText } from "../achievements/rewardText";
 import { ERROR_LABEL } from "./rules";
 import { CATEGORY_LABEL, QUEST_CATEGORIES, QUEST_TYPES, QUEST_TYPE_LABEL, type QuestCategory, type QuestType } from "./types";
 
@@ -9,6 +13,11 @@ export function QuestForm({ onDone }: { onDone: () => void }) {
   const members = useFamilyStore((s) => s.family?.members ?? []);
   const create = useQuestStore((s) => s.create);
   const toast = useToastStore((s) => s.show);
+  const quests = useQuestStore((s) => s.quests);
+  const claims = useGameStore((s) => s.rewardClaims);
+  const attachable = attachableAchievementIds(quests, new Set(claims.map((c) => c.achievementId)));
+  const options = ACHIEVEMENTS.filter((a) => attachable.has(a.id));
+  const [achievementId, setAchievementId] = useState("");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -27,6 +36,7 @@ export function QuestForm({ onDone }: { onDone: () => void }) {
       title, description, category, questType, assignedTo,
       targetValue: target ? Number(target) : undefined,
       dueDate: dueDate || undefined,
+      achievementId: achievementId || undefined,
     });
     if (r.ok) {
       toast("Quest dibuat");
@@ -79,6 +89,16 @@ export function QuestForm({ onDone }: { onDone: () => void }) {
           <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
         </label>
       </div>
+      <label>
+        Achievement saat disetujui (opsional)
+        <select value={achievementId} onChange={(e) => setAchievementId(e.target.value)}>
+          <option value="">Tanpa achievement</option>
+          {options.map((a) => (
+            <option key={a.id} value={a.id}>🏆 {a.title} — {rewardText(a)}</option>
+          ))}
+        </select>
+        {options.length === 0 && <small className="muted">Semua achievement sudah diraih atau sedang dipakai quest lain.</small>}
+      </label>
       <div className="form-actions">
         <button type="button" className="ghost-btn" onClick={onDone}>Batal</button>
         <button type="submit" className="primary" disabled={!title.trim() || assignedTo.length === 0}>Buat quest</button>

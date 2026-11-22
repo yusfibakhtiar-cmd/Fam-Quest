@@ -3,7 +3,7 @@ import { useGameStore } from "./gameStore";
 import { EMPTY_MATERIALS } from "../features/inventory/materials";
 
 const reset = () =>
-  useGameStore.setState({ materials: { ...EMPTY_MATERIALS }, unlockedBlueprints: [], claimedAchievements: [], objects: [] });
+  useGameStore.setState({ materials: { ...EMPTY_MATERIALS }, unlockedBlueprints: [], rewardClaims: [], objects: [] });
 
 describe("game store", () => {
   beforeEach(reset);

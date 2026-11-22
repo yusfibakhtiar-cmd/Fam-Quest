@@ -4,6 +4,8 @@ import { pendingSubmission, useQuestStore } from "../../stores/questStore";
 import { useToastStore } from "../../components/ui/Toast";
 import { isParent } from "../family/types";
 import { ERROR_LABEL } from "./rules";
+import { ACHIEVEMENTS } from "../achievements/definitions";
+import { rewardText } from "../achievements/rewardText";
 import { CATEGORY_LABEL, QUEST_TYPE_LABEL, STATUS_LABEL, type Quest } from "./types";
 
 export function QuestCard({ quest }: { quest: Quest }) {
@@ -18,12 +20,13 @@ export function QuestCard({ quest }: { quest: Quest }) {
   const nameOf = (id?: string) => members.find((m) => m.id === id)?.name ?? "?";
   const run = (r: ReturnType<typeof submit>, success: string) => {
     if (r.ok) {
-      toast(success);
+      toast(r.granted ? `🏆 ${r.granted.title}! ${rewardText(r.granted)}` : success);
       setNote("");
       setMode(null);
     } else toast(r.reason === "no_actor" ? "Pilih anggota dulu" : ERROR_LABEL[r.reason]);
   };
 
+  const achievement = ACHIEVEMENTS.find((a) => a.id === quest.achievementId);
   const pending = pendingSubmission(submissions, quest.id);
   const lastReview = [...submissions].reverse().find((s) => s.questId === quest.id && s.decision);
   const assignedToMe = !!me && quest.assignedTo.includes(me.id);
@@ -47,6 +50,11 @@ export function QuestCard({ quest }: { quest: Quest }) {
       </header>
 
       {quest.description && <p className="desc">{quest.description}</p>}
+      {achievement && (
+        <p className="achievement-chip">
+          🏆 {quest.status === "approved" ? "Membuka" : "Akan membuka"} <strong>{achievement.title}</strong> · {rewardText(achievement)}
+        </p>
+      )}
 
       {quest.targetValue !== undefined && (
         <div className="progress">

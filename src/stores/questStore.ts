@@ -6,8 +6,13 @@ import {
 import type { Quest, QuestSubmission } from "../features/quests/types";
 import { newId, nowIso } from "../utils/id";
 import { useActiveMember, useFamilyStore } from "./familyStore";
+import { useGameStore } from "./gameStore";
+import { attachableAchievementIds } from "../features/achievements/availability";
+import { ACHIEVEMENTS, type AchievementDefinition } from "../features/achievements/definitions";
 
-type Outcome = { ok: true } | { ok: false; reason: QuestError | "no_actor" };
+type Outcome = { ok: true; granted?: AchievementDefinition } | { ok: false; reason: QuestError | "no_actor" };
+
+const claimedIds = () => new Set(useGameStore.getState().rewardClaims.map((c) => c.achievementId));
 
 type QuestState = {
   quests: Quest[];
@@ -42,7 +47,8 @@ export const useQuestStore = create<QuestState>((set, get) => {
     create: (input) => {
       const { actor, members } = ctx();
       if (!actor) return NO_ACTOR;
-      const r = createQuest(actor, input, members, { id: newId("q"), now: nowIso() });
+      const attachable = attachableAchievementIds(get().quests, claimedIds());
+      const r = createQuest(actor, input, members, { id: newId("q"), now: nowIso() }, attachable);
       if (!r.ok) return r;
       set((s) => ({ quests: [r.value, ...s.quests] }));
       return { ok: true };
@@ -78,6 +84,12 @@ export const useQuestStore = create<QuestState>((set, get) => {
       if (!r.ok) return r;
       replace(r.value.quest);
       set((s) => ({ submissions: s.submissions.map((x) => (x.id === sub.id ? r.value.submission : x)) }));
+      // Approval → achievement → blueprint + materials (TDD §4.2). grantAchievement is idempotent,
+      // so even a duplicate link could never pay out twice.
+      if (decision === "approved" && q.achievementId) {
+        const granted = useGameStore.getState().grantAchievement(q.achievementId, { questId: q.id, approvedBy: actor.id });
+        if (granted) return { ok: true, granted: ACHIEVEMENTS.find((a) => a.id === q.achievementId) };
+      }
       return { ok: true };
     },
 

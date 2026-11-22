@@ -9,6 +9,7 @@ import { BottomNav } from "../components/navigation/BottomNav";
 import { FamilySetup } from "../features/family/FamilySetup";
 import { FamilyHub } from "../features/family/FamilyHub";
 import { QuestCenter } from "../features/quests/QuestCenter";
+import { AchievementsScreen } from "../features/achievements/AchievementsScreen";
 import { ROLE_LABEL } from "../features/family/types";
 import { useGameStore } from "../stores/gameStore";
 import { usePlacementStore } from "../stores/placementStore";
@@ -49,6 +50,7 @@ export function App() {
         </>
       )}
       {screen === "quests" && <QuestCenter />}
+      {screen === "achievements" && <AchievementsScreen />}
       {screen === "family" && <FamilyHub />}
 
       <BottomNav />
