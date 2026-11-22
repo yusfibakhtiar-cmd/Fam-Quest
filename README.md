@@ -39,3 +39,13 @@ npm run dev        # buka URL yang muncul; --host agar bisa dibuka dari HP di Wi
 ```bash
 npm test   # aturan grid, invariant ekonomi reward, dan transaksi bangun
 ```
+
+## Milestone 3 — Quest System
+
+- `src/features/quests/rules.ts` — state machine quest murni + cek izin (semua aturan di-unit-test)
+- `src/stores/familyStore.ts`, `questStore.ts` — keluarga, anggota aktif, quest & pengajuan (`quest_submissions`)
+- Layar: setup keluarga (pertama kali), **Quest** (buat, progres, ajukan, setujui/kembalikan), **Keluarga** (anggota, ganti anggota aktif)
+
+Alur: orang tua membuat quest → anggota yang ditugaskan mencatat progres → ajukan saat target tercapai → orang tua menyetujui atau mengembalikan dengan catatan.
+
+Belum: data hilang saat refresh (M5), quest belum membuka achievement (M4), pergantian anggota belum dilindungi login (M5).
