@@ -1,25 +1,40 @@
 # Keputusan Desain
 
-Catatan keputusan yang menyimpang dari atau melengkapi TDD v0.1.
+## 2026-11-22 — Arah produk: dunia sebagai cermin (pivot)
 
-| Tanggal | Keputusan | Alasan / konsekuensi |
+Spesifikasi fitur prototipe v3 menjadi acuan utama, menggantikan TDD v0.1 di titik yang bertentangan.
+Prinsip yang wajib dijaga:
+
+| # | Prinsip | Dijaga oleh |
 |---|---|---|
-| 2026-11-22 | Achievement memberi **blueprint + material dalam jumlah tetap**. | Mengisi celah TDD §4.3 vs §4.2. Konsekuensi: ukuran dunia dibatasi jumlah achievement; quest berulang butuh achievement bertingkat (diputuskan di M4). |
-| 2026-11-22 | Invariant: material reward ≥ biaya setiap blueprint yang dibuka. | Mencegah blueprint terbuka tapi tak bisa dibangun. Dijaga oleh `definitions.test.ts`. |
-| 2026-11-22 | Achievement awal "Langkah Pertama" diberikan sekali saat pertama dibuka. | Modal untuk rumah pertama sebelum ada quest. |
-| 2026-11-22 | Anchor objek = tile pojok (x, z terkecil) **setelah** rotasi; rotasi = 0–3 putaran 90°. | TDD tidak menetapkan; footprint non-persegi bertukar lebar/dalam saat diputar. |
-| 2026-11-22 | Scenery (pohon, batu, jalan) disimpan sebagai data grid dan memblokir tile. | Membersihkan lahan = fitur berikutnya. |
-| 2026-11-22 | **Hanya orang tua** yang menyetujui/menolak quest. | Keputusan pemilik produk. |
-| 2026-11-22 | Turunan: hanya orang tua yang membuat, membatalkan quest, dan menambah anggota. Anggota yang ditugaskan mencatat progres & mengajukan; orang tua boleh membantu mencatat progres. | Konsisten dengan peran orang tua sebagai pengelola. *Perlu dikonfirmasi.* |
-| 2026-11-22 | Orang tua tidak boleh menyetujui pengajuannya sendiri bila ada orang tua lain; keluarga dengan satu orang tua boleh. | Tanpa pengecualian, quest milik orang tua tunggal tak pernah bisa selesai. *Perlu dikonfirmasi.* |
-| 2026-11-22 | Penolakan wajib disertai catatan; quest yang ditolak bisa dikerjakan lagi & diajukan ulang. | Penolakan tanpa alasan tidak membantu anak memperbaiki. |
-| 2026-11-22 | Status `completed` dihapus (`approved` = final); `locked` ditunda. | Menghilangkan dua status yang tumpang-tindih di TDD §4.1. |
-| 2026-11-22 | Pergantian anggota aktif di perangkat **belum** dilindungi. | Bukan keamanan — login per anggota datang dengan Supabase Auth (M5). Sampai itu, anak secara teknis bisa "menjadi" orang tua. |
-| 2026-11-22 | Quest → achievement: **orang tua memilih achievement saat membuat quest** (opsional). | Opsi (a); sederhana dan eksplisit. Syarat otomatis ditunda. |
-| 2026-11-22 | Satu achievement hanya boleh terhubung ke satu quest terbuka, dan tidak bisa dipilih setelah diraih. Achievement awal tidak bisa dipilih. Membatalkan quest melepas achievement-nya. | Tanpa ini, persetujuan kedua diam-diam tidak memberi apa-apa. `grantAchievement` tetap idempoten sebagai pengaman kedua. |
-| 2026-11-22 | `reward_claims` mencatat achievement, waktu, quest asal, dan orang tua yang menyetujui. | "Cerita pencapaian" (TDD §1.1) ditampilkan di layar Pencapaian. |
+| P1 | Cermin, bukan toko: tanpa mata uang, poin, XP, pembelian | `deriveWorld()` murni; sistem material & menu bangun dihapus |
+| P2 | Ibadah tidak jadi transaksi/kompetisi | tidak ada reward, leaderboard, atau notifikasi "kalah" |
+| P3 | Tidak ada yang layu karena terlewat | elemen ibadah dihitung kumulatif (test) |
+| P4 | Tanpa streak; "boleh terlewat sekali, jangan dua kali" | `needsNotTwiceReminder()` (test) |
+| P5 | Anak tanpa target dan tanpa hadiah | anak hanya "ikut duduk" → bunga; tanpa pengingat (test) |
+| P6 | Mode bertahan | target "satu ayat pun cukup", bukan kegagalan |
+| P7 | Privat | tidak ada fitur berbagi |
+| P8 | Setiap aksi di game adalah aksi nyata | ketuk benda hanya mencatat aktivitas nyata; tidak ada penempatan bebas |
+
+**Dihapus dari Milestone 2–4:** material, menu bangun & penempatan bebas, quest dengan pengajuan/persetujuan
+orang tua, achievement dengan reward. Riwayatnya tetap ada di branch `milestone-4-achievements`.
+
+**Dipertahankan:** mesin 3D (kamera, terrain, lighting, model low-poly), anggota keluarga dinamis dengan peran.
+
+## Keputusan pendukung
+
+| Keputusan | Alasan |
+|---|---|
+| Dunia memakai homestead isometrik yang ada dengan tata letak tetap, bukan pulau melayang | Mesin dan kamera sudah teruji; yang penting aturan pemetaannya |
+| Anggota dinamis (`members` + `readings[date][memberId]`) | Anak kedua direncanakan; tidak lagi hard-code ayah/ibu/kecil |
+| Tanggal dihitung di zona waktu keluarga (`Asia/Jakarta`), bukan jam perangkat | Mencegah tanggal bergeser antar ponsel |
+| Siapa pun di perangkat bisa mencentang untuk siapa saja | Sama seperti v3; login per orang tua datang bersama backend |
+| Penyimpanan sekarang: localStorage di balik `FamilyRepository` | Memenuhi "tersimpan setelah dibuka ulang" untuk satu perangkat; adapter backend menyusul |
+| Pohon keluarga diberi ukuran dasar lebih besar; pohon buah dekorasi dihapus | Di hari pertama pohon keluarga kalah besar dari dekorasi dan sulit diketuk |
+| Pemetaan juz memakai perkiraan dari spesifikasi | Tabel juz akurat ada di backlog |
 
 ## Terbuka
-- **Hanya ada 4 achievement yang bisa diraih lewat quest.** Setelah semuanya diraih, quest tidak lagi menumbuhkan dunia. Perlu achievement bertingkat/berulang atau editor achievement (TDD §4.2 "dashboard admin").
-- Pindah/bongkar bangunan dengan refund — penting karena material langka.
-- Penyimpanan sementara (localStorage) sebelum Milestone 5.
+- **Backend untuk sinkron Ayah & Ibu** (Supabase atau Firebase) + login dua akun + offline-first.
+- F2 Papan Misi (dengan `contributions` per transaksi, bukan `saved` yang ditimpa), F3 Kenangan, F4 Evaluasi, F5 Data Ekonomi (`finance/{YYYY-MM}`).
+- Elemen dunia: sumur, ladang, jalan haji & gerbang, pagar, lentera kenangan, siklus waktu nyata, fallback 2D.
+- Pohon Ayah dan Ibu berdampingan dengan ukuran berbeda bisa terbaca sebagai perbandingan (P2). Perlu dipantau saat dipakai.

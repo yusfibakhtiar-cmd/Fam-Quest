@@ -104,7 +104,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .bottom-nav {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 10;
   height: calc(var(--nav-h) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(3, 1fr);
   background: rgba(251, 250, 245, 0.97); border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 .bottom-nav button {
@@ -189,17 +189,56 @@ legend { font-size: 13px; font-weight: 600; color: #3b4a3b; margin-bottom: 4px; 
 .link-btn { border: none; background: none; color: #8a8a8a; font-size: 13px; cursor: pointer; text-decoration: underline; margin-right: auto; }
 .toast { z-index: 40; }
 
-/* ---------- Milestone 4: achievements ---------- */
+
+/* ---------- Mirror world + Qur'an (FEATURES.md F1, F6) ---------- */
+:root { --gold: #e2b34a; --leaf: #3f8a5c; --ink: #1b3a1b; --muted: #6b6b6b; --paper: #fff; }
 .muted { color: #8a8a8a; font-weight: 400; }
-.achievement-chip { margin: 0; font-size: 13px; background: #fff8e1; border-radius: 10px; padding: 8px 10px; color: #6d4c00; }
-.achievement-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-.achievement-list li { display: flex; gap: 12px; background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
-.achievement-list li:not(.claimed) { opacity: 0.8; }
-.achievement-list li.claimed { outline: 2px solid #ffca28; }
-.trophy { font-size: 28px; line-height: 1; }
-.achievement-info { display: grid; gap: 3px; min-width: 0; }
-.achievement-info small { color: #5b6b5b; }
-.achievement-info .reward { color: #6d4c00; }
-.achievement-info .story { color: #2e7d32; font-weight: 600; }
-.link-inline { justify-self: start; border: none; background: none; padding: 0; color: #1565c0; font-size: 13px; cursor: pointer; text-align: left; text-decoration: underline; }
-.toast { max-width: calc(100% - 32px); text-align: center; }
+.hud-title .date { margin: 2px 0 0; font-size: 13px; color: #2e4d2e; }
+.home-hint { margin: 6px 0 0; font-size: 13px; background: rgba(255,255,255,0.85); border-radius: 10px; padding: 6px 10px; display: inline-block; }
+.card { background: var(--paper); border-radius: 16px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: grid; gap: 8px; margin-top: 8px; }
+.panel h3.flush { margin: 0; }
+.segmented { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: #edf0e8; border-radius: 12px; padding: 3px; gap: 3px; }
+.segmented button { border: none; background: transparent; border-radius: 10px; height: 38px; cursor: pointer; font-weight: 600; color: #3b4a3b; }
+.segmented button.on { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.12); color: var(--leaf); }
+.target { margin: 4px 0 0; font-size: 18px; font-weight: 700; color: var(--ink); }
+.counter { justify-self: end; font-size: 12px; }
+.gentle { margin: 0 0 8px; background: #fff8e1; color: #6d4c00; border-radius: 10px; padding: 8px 10px; font-size: 14px; }
+.checks-today { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.check-btn { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; border: 1px solid #dfe5d8; background: #fff; border-radius: 14px; padding: 12px; cursor: pointer; }
+.check-btn span:last-child { display: grid; }
+.check-btn small { color: var(--muted); }
+.check-btn .tick { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #b9c4b0; display: grid; place-items: center; font-weight: 800; color: #fff; flex: none; }
+.check-btn.on { border-color: var(--leaf); background: #eef7f0; }
+.check-btn.on .tick { background: var(--leaf); border-color: var(--leaf); }
+.calendars { display: grid; gap: 10px; }
+.cal { display: grid; grid-template-columns: 84px 1fr; align-items: center; gap: 8px; }
+.cal-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-grid { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; }
+.cell { aspect-ratio: 1; border-radius: 4px; background: #e6eae0; }
+.cell.on { background: #66bb6a; }
+.cell.today { outline: 2px solid var(--ink); outline-offset: 1px; }
+.bookmark { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.page-big .num { font-size: 40px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ink); }
+.page-big .of { font-size: 16px; color: var(--muted); margin-left: 4px; }
+.page-meta { font-size: 14px; color: #3b4a3b; font-weight: 600; }
+.page-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.jump { display: flex; gap: 6px; margin-left: auto; }
+.jump input { width: 96px; }
+.juz-map { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-top: 4px; }
+.juz { aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: #edf0e8; color: #6b776b; font-variant-numeric: tabular-nums; }
+.juz.done { background: #66bb6a; color: #fff; }
+.juz.current { background: var(--gold); color: #3d2a00; }
+.khatam { background: #fff8e1; border-radius: 12px; padding: 12px; display: grid; gap: 6px; text-align: center; }
+.khatam p { margin: 0; }
+.object-card {
+  position: absolute; left: 16px; right: 16px; bottom: var(--bottom); z-index: 6; max-width: 460px; margin: 0 auto;
+  background: rgba(255,255,255,0.97); border-radius: 18px; padding: 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.2); display: grid; gap: 6px;
+}
+.object-card header { display: flex; justify-content: space-between; align-items: center; }
+.object-card h3 { margin: 0; font-size: 18px; }
+.object-card .value { margin: 0; font-weight: 700; color: var(--ink); }
+.object-card .rule { margin: 0; font-size: 13px; color: var(--muted); }
+.object-card footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.object-card .wide { flex-basis: 100%; margin: 0; }
+.setup-card .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.error { margin: 0; color: #c62828; font-size: 14px; }

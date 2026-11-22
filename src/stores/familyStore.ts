@@ -1,46 +1,73 @@
 import { create } from "zustand";
-import { isParent, type Family, type Member, type Role } from "../features/family/types";
+import { localRepository, type FamilyRepository } from "../data/repository";
+import { DEFAULT_TIME_ZONE, ANCHOR_MAX, type FamilyData, type Member, type QuranMode, type Role } from "../domain/types";
+import { jumpToPage, movePage, startNextKhatam, toggleReading } from "../domain/quran";
+import { importV3, type V3Names } from "../domain/importV3";
 import { newId } from "../utils/id";
 
-type FamilyState = {
-  family: Family | null;
-  /**
-   * Who is using the device right now. NOT authentication: anyone can switch.
-   * Real per-member login arrives with Supabase auth in Milestone 5.
-   */
-  activeMemberId: string | null;
-
-  createFamily: (familyName: string, parentName: string) => void;
-  /** Only parents add members. Returns false if refused or invalid. */
-  addMember: (name: string, role: Role) => boolean;
-  setActiveMember: (id: string) => void;
+type FamilyStore = {
+  data: FamilyData | null;
+  createFamily: (input: { familyName: string; parents: string[]; children: string[] }) => void;
+  importFromV3: (raw: unknown, names: V3Names) => void;
+  addMember: (name: string, role: Role) => void;
+  toggleToday: (date: string, memberId: string) => void;
+  movePage: (delta: number) => void;
+  jumpToPage: (page: number) => void;
+  startNextKhatam: () => void;
+  setMode: (mode: QuranMode) => void;
+  setAnchor: (anchor: string) => void;
 };
 
-export const useFamilyStore = create<FamilyState>((set, get) => ({
-  family: null,
-  activeMemberId: null,
+/**
+ * Every change is written through to the repository immediately: a check-in after Isya
+ * must survive closing the app (FEATURES.md §6 offline-first).
+ */
+export function createFamilyStore(repo: FamilyRepository) {
+  return create<FamilyStore>((set, get) => {
+    const commit = (next: FamilyData) => {
+      repo.save(next);
+      set({ data: next });
+    };
+    const update = (fn: (d: FamilyData) => FamilyData) => {
+      const d = get().data;
+      if (d) commit(fn(d));
+    };
+    const member = (name: string, role: Role): Member => ({ id: newId("m"), name: name.trim(), role });
 
-  createFamily: (familyName, parentName) => {
-    const parent: Member = { id: newId("m"), name: parentName.trim(), role: "parent" };
-    set({ family: { id: newId("f"), name: familyName.trim(), members: [parent] }, activeMemberId: parent.id });
-  },
+    return {
+      data: repo.load(),
 
-  addMember: (name, role) => {
-    const { family } = get();
-    const actor = useActiveMember.get();
-    if (!family || !isParent(actor) || !name.trim()) return false;
-    set({ family: { ...family, members: [...family.members, { id: newId("m"), name: name.trim(), role }] } });
-    return true;
-  },
+      createFamily: ({ familyName, parents, children }) =>
+        commit({
+          version: 1,
+          family: {
+            id: newId("f"),
+            name: familyName.trim(),
+            timeZone: DEFAULT_TIME_ZONE,
+            members: [
+              ...parents.filter((n) => n.trim()).map((n) => member(n, "parent")),
+              ...children.filter((n) => n.trim()).map((n) => member(n, "child")),
+            ],
+          },
+          quran: { page: 1, khatam: 0, anchor: "", mode: "normal" },
+          readings: {},
+        }),
 
-  setActiveMember: (id) => {
-    if (get().family?.members.some((m) => m.id === id)) set({ activeMemberId: id });
-  },
-}));
+      importFromV3: (raw, names) => commit(importV3(raw, names, newId)),
 
-const selectActive = (s: FamilyState) => s.family?.members.find((m) => m.id === s.activeMemberId);
+      addMember: (name, role) => {
+        if (!name.trim()) return;
+        update((d) => ({ ...d, family: { ...d.family, members: [...d.family.members, member(name, role)] } }));
+      },
 
-export function useActiveMember(): Member | undefined {
-  return useFamilyStore(selectActive);
+      toggleToday: (date, memberId) => update((d) => ({ ...d, readings: toggleReading(d.readings, date, memberId) })),
+      movePage: (delta) => update((d) => ({ ...d, quran: movePage(d.quran, delta) })),
+      jumpToPage: (page) => update((d) => ({ ...d, quran: jumpToPage(d.quran, page) })),
+      startNextKhatam: () => update((d) => ({ ...d, quran: startNextKhatam(d.quran) })),
+      setMode: (mode) => update((d) => ({ ...d, quran: { ...d.quran, mode } })),
+      setAnchor: (anchor) => update((d) => ({ ...d, quran: { ...d.quran, anchor: anchor.slice(0, ANCHOR_MAX) } })),
+    };
+  });
 }
-useActiveMember.get = (): Member | undefined => selectActive(useFamilyStore.getState());
+
+export const useFamilyStore = createFamilyStore(localRepository);

@@ -1,58 +1,49 @@
-import { useEffect } from "react";
 import { World } from "../game/world/World";
 import { CameraHud } from "../components/ui/CameraHud";
-import { InventoryBar } from "../components/ui/InventoryBar";
-import { BuildMenu } from "../components/ui/BuildMenu";
-import { PlacementBar } from "../components/ui/PlacementBar";
 import { Toast } from "../components/ui/Toast";
 import { BottomNav } from "../components/navigation/BottomNav";
 import { FamilySetup } from "../features/family/FamilySetup";
-import { FamilyHub } from "../features/family/FamilyHub";
-import { QuestCenter } from "../features/quests/QuestCenter";
-import { AchievementsScreen } from "../features/achievements/AchievementsScreen";
-import { ROLE_LABEL } from "../features/family/types";
-import { useGameStore } from "../stores/gameStore";
-import { usePlacementStore } from "../stores/placementStore";
-import { useActiveMember, useFamilyStore } from "../stores/familyStore";
+import { FamilyScreen } from "../features/family/FamilyScreen";
+import { QuranScreen } from "../features/quran/QuranScreen";
+import { ObjectCard } from "../features/world/ObjectCard";
+import { useFamilyStore } from "../stores/familyStore";
 import { useUiStore } from "../stores/uiStore";
+import { useToday } from "../hooks/useToday";
+import { useQuranView } from "../features/quran/useQuranView";
+
+function HomeHint() {
+  const { data, readToday } = useQuranView();
+  if (!data) return null;
+  const parents = data.family.members.filter((m) => m.role === "parent");
+  const done = parents.filter(readToday).length;
+  return <p className="home-hint">{done === parents.length && parents.length > 0 ? "Semua orang tua sudah membaca hari ini." : "Ketuk pohon atau rumah untuk mencatat."}</p>;
+}
 
 export function App() {
-  const grantStarterRewards = useGameStore((s) => s.grantStarterRewards);
-  const placing = usePlacementStore((s) => s.activeType !== null);
-  const openMenu = usePlacementStore((s) => s.openMenu);
-  const hasFamily = useFamilyStore((s) => s.family !== null);
-  const me = useActiveMember();
-  const { screen, go } = useUiStore();
-
-  // Idempotent: the store refuses to grant a claimed achievement twice.
-  useEffect(() => grantStarterRewards(), [grantStarterRewards]);
+  const hasFamily = useFamilyStore((s) => s.data !== null);
+  const name = useFamilyStore((s) => s.data?.family.name);
+  const screen = useUiStore((s) => s.screen);
+  const hasSelection = useUiStore((s) => s.selected !== null);
+  const { today } = useToday();
+  const dateLabel = new Date(`${today}T12:00:00Z`).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 
   return (
     <div className="app">
-      {/* The world stays mounted under the other screens so camera and placement state survive. */}
-      <World />
+      {/* The world stays mounted so the camera keeps its place between tabs. */}
+      <World paused={screen !== "home"} />
       <header className="hud-title">
-        <h1>Family Quest</h1>
-        {me && (
-          <button className="member-chip" onClick={() => go("family")} title="Ganti anggota">
-            {me.name} · {ROLE_LABEL[me.role]}
-          </button>
-        )}
-        {screen === "world" && <InventoryBar />}
+        <h1>{name ?? "Rumah Kita"}</h1>
+        <p className="date">{dateLabel}</p>
+        {screen === "home" && <HomeHint />}
       </header>
-
-      {screen === "world" && (
+      {screen === "home" && (
         <>
-          {!placing && <button className="build-btn primary" onClick={openMenu}>🔨 Bangun</button>}
-          <CameraHud />
-          <PlacementBar />
-          <BuildMenu />
+          {!hasSelection && <CameraHud />}
+          <ObjectCard />
         </>
       )}
-      {screen === "quests" && <QuestCenter />}
-      {screen === "achievements" && <AchievementsScreen />}
-      {screen === "family" && <FamilyHub />}
-
+      {screen === "quran" && <QuranScreen />}
+      {screen === "family" && <FamilyScreen />}
       <BottomNav />
       {!hasFamily && <FamilySetup />}
       <Toast />

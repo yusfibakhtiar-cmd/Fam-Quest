@@ -1,57 +1,26 @@
-# Family Quest — Prototype v0.1
+# Family Quest — Rumah Kita
 
-Milestone 1 (Empty World): sebidang tanah 3D isometrik 20×20 tile, kamera orthographic yang bisa digeser, di-zoom, diputar 90°, dan di-reset.
+Dunia 3D keluarga yang **mencerminkan** apa yang benar-benar terjadi: tanpa poin, toko, atau streak.
+Prinsip produk dan keputusan: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 ## Menjalankan
 
 ```bash
 npm install
-npm run dev        # buka URL yang muncul; --host agar bisa dibuka dari HP di Wi-Fi yang sama
+npm run dev     # --host: bisa dibuka dari HP di Wi-Fi yang sama
+npm test
 ```
 
-## Kontrol
-- Drag (mouse/1 jari): geser kamera — dibatasi agar tidak keluar dari tanah
-- Scroll / cubit 2 jari: zoom
-- Tombol ⟲ ⟳: putar 90° · + −: zoom · #: tampilkan grid · ⌂: reset
+## Yang sudah ada (F1 — Al-Qur'an)
+- Centang harian per anggota (orang tua: "sudah baca", anak: "ikut duduk"), pengingat "jangan dua kali"
+- Kalender 28 hari, pembatas mushaf keluarga (1–604), peta 30 juz, khatam
+- Mode normal / bertahan, jangkar kebiasaan (140 karakter)
+- Dunia: rumah bertingkat mengikuti khatam & pembatas, pohon per orang tua tumbuh dari hari membaca,
+  taman bunga dari hari anak ikut duduk. Ketuk benda untuk mencatat.
+- Data tersimpan di perangkat (localStorage); impor data prototipe v3
 
 ## Struktur
-- `src/game/world/constants.ts` — ukuran grid, konversi tile → koordinat dunia, parameter kamera
-- `src/game/world/scenery.ts` — pohon/batu/semak sebagai **data grid** (seeded, selalu sama). Milestone 2 harus menganggap tile ini terisi.
-- `src/game/camera/CameraRig.tsx` — kamera isometrik (MapControls, rotasi bebas dimatikan)
-- `src/game/terrain/` — tanah, jalan setapak, overlay grid
-- `src/game/objects/Nature.tsx` — model low-poly placeholder dari primitif (bisa diganti glTF)
-- `src/stores/cameraStore.ts` — state kamera (Zustand)
-
-## Milestone 2 — Build System
-
-- `src/features/builder/catalog.ts` — katalog bangunan (TDD §4.4)
-- `src/features/builder/grid.ts` — aturan grid murni: footprint berputar (4×3 → 3×4), cek batas & tumpang-tindih
-- `src/features/achievements/definitions.ts` — reward achievement = blueprint + material tetap
-- `src/stores/gameStore.ts` — material, blueprint terbuka, klaim achievement (sekali saja), objek terpasang
-- `src/game/placement/PlacementLayer.tsx` — ghost bangunan + tile hijau/merah
-
-**Konvensi anchor:** `(gx, gz)` objek = tile pojok dengan x dan z terkecil *setelah* rotasi. Rotasi = jumlah putaran 90° (0–3).
-
-**Kontrol penempatan:** ketuk/klik tanah untuk memindahkan (di desktop ghost mengikuti mouse) · `R` putar · `Enter` bangun · `Esc` batal.
-
-**Tombol "Klaim (dev)"** hanya muncul di `npm run dev`: mensimulasikan achievement lewat jalur reward yang sama yang nanti dipakai Milestone 4.
-
-```bash
-npm test   # aturan grid, invariant ekonomi reward, dan transaksi bangun
-```
-
-## Milestone 3 — Quest System
-
-- `src/features/quests/rules.ts` — state machine quest murni + cek izin (semua aturan di-unit-test)
-- `src/stores/familyStore.ts`, `questStore.ts` — keluarga, anggota aktif, quest & pengajuan (`quest_submissions`)
-- Layar: setup keluarga (pertama kali), **Quest** (buat, progres, ajukan, setujui/kembalikan), **Keluarga** (anggota, ganti anggota aktif)
-
-Alur: orang tua membuat quest → anggota yang ditugaskan mencatat progres → ajukan saat target tercapai → orang tua menyetujui atau mengembalikan dengan catatan.
-
-Belum: data hilang saat refresh (M5), quest belum membuka achievement (M4), pergantian anggota belum dilindungi login (M5).
-
-## Milestone 4 — Achievement Integration
-
-- Orang tua memilih achievement (opsional) saat membuat quest; disetujui → blueprint + material masuk otomatis
-- `src/features/achievements/availability.ts` — achievement mana yang boleh dipilih (belum diraih, tidak dipakai quest terbuka lain, bukan achievement awal)
-- Layar **Pencapaian**: diraih (dengan cerita: kapan, lewat quest apa, disetujui siapa), sedang diperjuangkan, atau tersedia
+- `src/domain/` — logika murni + unit test: `deriveWorld`, `quran`, `dates`, `importV3`
+- `src/data/repository.ts` — batas penyimpanan (localStorage sekarang, backend menyusul)
+- `src/game/mirror/` — rumah, pohon, taman (dirender dari `deriveWorld`)
+- `src/features/` — layar Al-Qur'an, keluarga, kartu ketuk
